@@ -3,18 +3,46 @@ import AddOption from './AddOption';
 import Header from './Header';
 import Action from './Action';
 import Options from './Options';
-
+import OptionModal from './OptionModal';
 
 class IndecisionApp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleDeleteOptions = this.handleDeleteOptions.bind(this);
-        this.handlePick = this.handlePick.bind(this);
-        this.handleAddOption = this.handleAddOption.bind(this);
-        this.handleDeletOption = this.handleDeletOption.bind(this);
-        this.state = {
-            options: []
-        };
+    state = {
+        options: [],
+        selectedOption: undefined
+    };
+    handleClearModal = () => {
+        this.setState(() => ({
+            selectedOption: undefined
+        }));
+    }
+    handleDeleteOptions = () => {
+        this.setState(() => ({ options: [] }));   
+    }
+    handleDeletOption = (optionToRemove) => {
+        this.setState((prevState) => ({
+            options: prevState.options.filter((option) => optionToRemove !== option)
+            
+        }));
+    }
+    handlePick = () => {
+        const randomNum = Math.floor(Math.random() * this.state.options.length);
+        const option = this.state.options[randomNum];
+        this.setState(() => ({
+            selectedOption: option
+        }));
+    }
+    handleAddOption = (option) => {
+        if (!option) {
+            return 'Enter Valid value to add item';
+        } else if (this.state.options.indexOf(option) > -1) {
+            return 'This option already exists';
+        } 
+
+        this.setState((prevState) => ({ 
+            options: prevState.options.concat(option)
+        }));
+
+
     }
     componentDidMount() {
         try {
@@ -37,37 +65,14 @@ class IndecisionApp extends React.Component {
         }
         
     }
-    handleDeleteOptions() {
-        this.setState(() => ({ options: [] }));   
-    }
+    
     componentWillUnmount() {
         console.log('componentWillUnmount');
     }
-    handleDeletOption(optionToRemove) {
-        this.setState((prevState) => ({
-            options: prevState.options.filter((option) => optionToRemove !== option)
-            
-        }));
-    }
+    
 
-    handlePick() {
-        const randomNum = Math.floor(Math.random() * this.state.options.length);
-        const option = this.state.options[randomNum];
-        alert(option);
-    }
-    handleAddOption(option) {
-        if (!option) {
-            return 'Enter Valid value to add item';
-        } else if (this.state.options.indexOf(option) > -1) {
-            return 'This option already exists';
-        } 
-
-        this.setState((prevState) => ({ 
-            options: prevState.options.concat(option)
-        }));
-
-
-    }
+   
+    
     render() {
         const subtitle = "Put your life in the hands of a computer";
         return (
@@ -84,6 +89,10 @@ class IndecisionApp extends React.Component {
                 />
                 <AddOption
                     handleAddOption={this.handleAddOption} 
+                />
+                <OptionModal 
+                    selectedOption={this.state.selectedOption}
+                    handleClearModal={this.handleClearModal}
                 />
             </div>
         );
